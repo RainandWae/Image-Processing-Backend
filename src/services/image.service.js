@@ -36,8 +36,22 @@ const applyTransformations = async (inputPath, outputPath, transformations) => {
     ]);
   }
 
-  if (transformations.format) {
-    pipeline = pipeline.toFormat(transformations.format);
+  const outputFormat = transformations.format;
+
+  if (outputFormat === 'jpeg' || outputFormat === 'jpg') {
+    pipeline = pipeline.jpeg({
+      quality: transformations.quality || 80,
+    });
+  } else if (outputFormat === 'png') {
+    pipeline = pipeline.png({
+      quality: transformations.quality || 80,
+    });
+  } else if (outputFormat === 'webp') {
+    pipeline = pipeline.webp({
+      quality: transformations.quality || 80,
+    });
+  } else if (outputFormat) {
+    pipeline = pipeline.toFormat(outputFormat);
   }
 
   await pipeline.toFile(outputPath);

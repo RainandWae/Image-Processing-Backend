@@ -95,6 +95,17 @@ const validateTransform = (req, res, next) => {
     }
   }
 
+  if (
+    transformations.quality !== undefined &&
+    (!Number.isInteger(transformations.quality) ||
+      transformations.quality < 1 ||
+      transformations.quality > 100)
+  ) {
+    return res.status(400).json({
+      message: 'Quality must be an integer between 1 and 100',
+    });
+  }
+
   next();
 };
 

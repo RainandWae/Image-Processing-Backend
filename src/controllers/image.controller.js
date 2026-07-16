@@ -2,7 +2,7 @@ const path = require('path');
 const sharp = require('sharp');
 const Image = require('../models/Image');
 const {
-    applyTransformation,
+    applyTransformations,
     buildTransformedFilename,
 } = require('../services/image.service');
 
