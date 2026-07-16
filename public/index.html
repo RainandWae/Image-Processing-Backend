@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Processing Backend Demo</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Backend demo client</p>
+        <h1>Image Processing Service</h1>
+        <p class="muted">
+          Frontend for testing JWT auth, uploads, user-owned image records,
+          transformations, caching, and deletion.
+        </p>
+      </div>
+      <div class="status-card">
+        <span id="authStatus" class="pill danger">Logged out</span>
+        <button id="logoutBtn" class="ghost">Logout</button>
+      </div>
+    </section>
+
+    <section class="grid two">
+      <form id="registerForm" class="card">
+        <h2>Register</h2>
+        <label>Username <input name="username" type="text" placeholder="user1" required /></label>
+        <label>Password <input name="password" type="password" placeholder="password123" required /></label>
+        <button type="submit">Create account</button>
+      </form>
+
+      <form id="loginForm" class="card">
+        <h2>Login</h2>
+        <label>Username <input name="username" type="text" placeholder="user1" required /></label>
+        <label>Password <input name="password" type="password" placeholder="password123" required /></label>
+        <button type="submit">Login</button>
+      </form>
+    </section>
+
+    <section class="grid two">
+      <form id="uploadForm" class="card">
+        <h2>Upload Image</h2>
+        <label>Image file <input name="image" type="file" accept="image/jpeg,image/png,image/webp" required /></label>
+        <button type="submit">Upload</button>
+      </form>
+
+      <div class="card">
+        <h2>Image List</h2>
+        <div class="toolbar">
+          <button id="refreshBtn" type="button">Refresh images</button>
+          <span id="imageCount" class="muted"></span>
+        </div>
+        <p class="muted small">Click an image card to select it for transformation.</p>
+      </div>
+    </section>
+
+    <section class="grid">
+      <form id="transformForm" class="card">
+        <div class="section-title">
+          <div>
+            <h2>Transform Selected Image</h2>
+            <p id="selectedImageText" class="muted small">No image selected.</p>
+          </div>
+          <button id="clearSelectionBtn" type="button" class="ghost">Clear</button>
+        </div>
+
+        <div class="transform-grid">
+          <label>Width <input name="width" type="number" min="1" max="5000" placeholder="300" /></label>
+          <label>Height <input name="height" type="number" min="1" max="5000" placeholder="300" /></label>
+          <label>Rotate <input name="rotate" type="number" placeholder="90" /></label>
+          <label>
+            Format
+            <select name="format">
+              <option value="">Keep original</option>
+              <option value="jpeg">JPEG</option>
+              <option value="png">PNG</option>
+              <option value="webp">WebP</option>
+            </select>
+          </label>
+          <label>Quality <input name="quality" type="number" min="1" max="100" placeholder="80" /></label>
+        </div>
+
+        <div class="checks">
+          <label><input name="flip" type="checkbox" /> Flip vertical</label>
+          <label><input name="mirror" type="checkbox" /> Mirror horizontal</label>
+          <label><input name="grayscale" type="checkbox" /> Grayscale</label>
+          <label><input name="sepia" type="checkbox" /> Sepia</label>
+        </div>
+
+        <button type="submit">Run transformation</button>
+      </form>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>Images</h2>
+        <div id="images" class="images"></div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>API Output</h2>
+        <pre id="output">{}</pre>
+      </div>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

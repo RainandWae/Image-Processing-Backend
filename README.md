@@ -123,6 +123,12 @@ Basic image processing is handled with Sharp. The transformation functionality i
 
 To avoid unnecessary duplicate work, transformed images are cached using a stable transformation key. If the same user requests the same transformation for the same original image, the API returns the existing transformed image instead of generating another file.
 
+## Frontend Demo
+
+The project also includes a simple frontend served directly by Express from the `public/` folder. It is not a separate React app or production UI; it is a lightweight demo client for quickly testing the backend functionality in the browser.
+
+The frontend supports registering, logging in, uploading images, listing user-owned images, selecting an image, running transformations, opening image URLs, deleting images, and viewing raw API responses.
+
 ## Environment Variables
 
 Create a `.env` file in the project root:
@@ -150,6 +156,12 @@ npm run dev
 ```
 
 The API runs on:
+
+```text
+http://localhost:5000
+```
+
+The frontend demo is available at the same address:
 
 ```text
 http://localhost:5000
