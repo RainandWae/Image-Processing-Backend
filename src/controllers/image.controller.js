@@ -5,7 +5,7 @@ const {
     applyTransformations,
     buildTransformedFilename,
 } = require('../services/image.service');
-
+const fs = require('fs');
 
 const uploadImage = async (req, res) => {
   try {
@@ -184,9 +184,41 @@ const transformImage = async (req, res) => {
   }
 };
 
+const deleteImage = async (req, res) => {
+  try {
+    const image = await Image.findOne({
+      _id: req.params.id,
+      user: req.user._id,
+    });
+
+    if (!image) {
+      return res.status(404).json({
+        message: 'Image not found',
+      });
+    }
+
+    if (fs.existsSync(image.path)) {
+      fs.unlinkSync(image.path);
+    }
+
+    await Image.deleteOne({_id: image._id });
+
+    return res.status(200).json({
+      message: 'Image deleted successfully',
+      id: image._id,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Server error while deleting image',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   uploadImage,
   listImages,
   getImageById,
   transformImage,
+  deleteImage,
 };

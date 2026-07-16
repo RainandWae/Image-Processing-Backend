@@ -6,6 +6,7 @@ const {
     listImages,
     getImageById,
     transformImage,
+    deleteImage,
  } = require('../controllers/image.controller');
 
 const validateTransform = require('../middleware/validateTransform.middleware');
@@ -16,6 +17,8 @@ const router = express.Router();
 router.post('/images', protect, upload.single('image'), uploadImage);
 router.get('/images', protect, listImages);
 router.get('/images/:id', protect, getImageById);
+router.delete('/images/:id', protect, deleteImage);
+
 router.post(
   '/images/:id/transform',
   protect,
