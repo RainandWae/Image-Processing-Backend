@@ -6,6 +6,7 @@ const {
     buildTransformedFilename,
 } = require('../services/image.service');
 const fs = require('fs');
+const stableStringify = require('../utils/stableStringify');
 
 const uploadImage = async (req, res) => {
   try {
@@ -128,6 +129,32 @@ const transformImage = async (req, res) => {
       });
     }
 
+    const transformationKey = stableStringify(transformations);
+
+    const cachedImage = await Image.findOne({
+      user: req.user._id,
+      parentImage: originalImage._id,
+      transformationKey,
+    });
+
+    if (cachedImage) {
+      return res.status(200).json({
+        id: cachedImage._id,
+        originalImage: originalImage._id,
+        url: cachedImage.url,
+        cached: true,
+        metadata: {
+          filename: cachedImage.filename,
+          mimeType: cachedImage.mimeType,
+          size: cachedImage.size,
+          width: cachedImage.width,
+          height: cachedImage.height,
+          format: cachedImage.format,
+        },
+        transformations: cachedImage.transformations,
+      });
+    }
+
     const outputFormat = transformations.format || originalImage.format || 'jpeg';
     const transformedFilename = buildTransformedFilename(
       originalImage.filename,
@@ -160,12 +187,14 @@ const transformImage = async (req, res) => {
       isTransformed: true,
       parentImage: originalImage._id,
       transformations,
+      transformationKey,
     });
 
     return res.status(201).json({
       id: transformedImage._id,
       originalImage: originalImage._id,
       url: transformedImage.url,
+      cached: false,
       metadata: {
         filename: transformedImage.filename,
         mimeType: transformedImage.mimeType,

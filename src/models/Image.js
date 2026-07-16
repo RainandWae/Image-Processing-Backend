@@ -53,10 +53,20 @@ const imageSchema = new mongoose.Schema(
       type: Object,
       default: {},
     },
+    transformationKey: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: true,
   }
 );
+
+imageSchema.index({
+  user: 1,
+  parentImage: 1,
+  transformationKey: 1,
+});
 
 module.exports = mongoose.model('Image', imageSchema);
