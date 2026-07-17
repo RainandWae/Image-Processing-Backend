@@ -10,8 +10,12 @@ const options = {
     },
     servers: [
       {
+        url: 'http://localhost:5000/api/v1',
+        description: 'Local development server - versioned API',
+      },
+      {
         url: 'http://localhost:5000',
-        description: 'Local development server',
+        description: 'Legacy root API routes',
       },
     ],
     components: {

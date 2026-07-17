@@ -79,4 +79,24 @@ describe('Auth API', () => {
 
     expect(response.body.user.username).toBe('user1');
   });
+
+  test('supports versioned auth routes', async () => {
+    const registerResponse = await request(app)
+      .post('/api/v1/register')
+      .send({
+        username: 'versioned-user',
+        password: 'password123',
+      })
+      .expect(201);
+
+    expect(registerResponse.body.user.username).toBe('versioned-user');
+    expect(registerResponse.body.token).toBeDefined();
+
+    const meResponse = await request(app)
+      .get('/api/v1/me')
+      .set('Authorization', `Bearer ${registerResponse.body.token}`)
+      .expect(200);
+
+    expect(meResponse.body.user.username).toBe('versioned-user');
+  });
 });

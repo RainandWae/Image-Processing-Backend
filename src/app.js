@@ -31,6 +31,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+app.use('/api/v1', jobRoutes);
 app.use('/', jobRoutes);
 
 app.get('/health', (req, res) => {
@@ -40,6 +41,8 @@ app.get('/health', (req, res) => {
   });
 });
 
+app.use('/api/v1', authRoutes);
+app.use('/api/v1', imageRoutes);
 app.use('/', authRoutes);
 app.use('/', imageRoutes);
 

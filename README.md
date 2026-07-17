@@ -85,15 +85,18 @@ flowchart TD
 src/
   config/
     db.js
+    env.js
     swagger.js
 
   controllers/
     auth.controller.js
     image.controller.js
+    job.controller.js
 
   middleware/
     auth.middleware.js
     error.middleware.js
+    logger.middleware.js
     upload.middleware.js
     validateObjectId.middleware.js
     validateTransform.middleware.js
@@ -102,13 +105,16 @@ src/
   models/
     User.js
     Image.js
+    Job.js
 
   routes/
     auth.routes.js
     image.routes.js
+    job.routes.js
 
   services/
     image.service.js
+    job.service.js
 
   utils/
     asyncHandler.js
@@ -160,6 +166,31 @@ The Swagger setup lives in:
 ```text
 src/config/swagger.js
 ```
+
+## API Versioning
+
+The recommended API base path is:
+
+```text
+http://localhost:5000/api/v1
+```
+
+Example routes:
+
+```text
+POST   /api/v1/register
+POST   /api/v1/login
+GET    /api/v1/me
+POST   /api/v1/images
+GET    /api/v1/images
+GET    /api/v1/images/:id
+DELETE /api/v1/images/:id
+POST   /api/v1/images/:id/transform
+POST   /api/v1/images/:id/jobs
+GET    /api/v1/jobs/:id
+```
+
+The original root routes still work for backwards compatibility, but new clients should use `/api/v1`.
 
 ## Environment Variables
 
