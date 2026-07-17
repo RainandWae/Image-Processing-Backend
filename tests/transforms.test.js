@@ -25,7 +25,10 @@ const registerAndUploadImage = async () => {
   const uploadResponse = await request(app)
     .post('/images')
     .set('Authorization', `Bearer ${userToken}`)
-    .attach('image', imagePath)
+    .attach('image', imagePath, {
+      filename: 'test-image.jpg',
+      contentType: 'image/jpeg',
+    })
     .expect(201);
 
   return {

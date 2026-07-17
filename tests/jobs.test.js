@@ -26,7 +26,10 @@ const uploadImage = async (token) => {
   const response = await request(app)
     .post('/images')
     .set('Authorization', `Bearer ${token}`)
-    .attach('image', imagePath)
+    .attach('image', imagePath, {
+      filename: 'test-image.jpg',
+      contentType: 'image/jpeg',
+    })
     .expect(201);
 
   return response.body.id;

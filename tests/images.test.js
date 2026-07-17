@@ -56,7 +56,10 @@ describe('Images API', () => {
     const response = await request(app)
       .post('/images')
       .set('Authorization', `Bearer ${token}`)
-      .attach('image', imagePath)
+      .attach('image', imagePath, {
+        filename: 'test-image.jpg',
+        contentType: 'image/jpeg',
+      })
       .expect(201);
 
     expect(response.body.id).toBeDefined();
@@ -69,7 +72,10 @@ describe('Images API', () => {
     await request(app)
       .post('/images')
       .set('Authorization', `Bearer ${token}`)
-      .attach('image', imagePath)
+      .attach('image', imagePath, {
+        filename: 'test-image.jpg',
+        contentType: 'image/jpeg',
+      })
       .expect(201);
 
     const response = await request(app)
@@ -85,7 +91,10 @@ describe('Images API', () => {
     const uploadResponse = await request(app)
       .post('/images')
       .set('Authorization', `Bearer ${token}`)
-      .attach('image', imagePath)
+      .attach('image', imagePath, {
+        filename: 'test-image.jpg',
+        contentType: 'image/jpeg',
+      })
       .expect(201);
 
     const response = await request(app)
@@ -109,7 +118,10 @@ describe('Images API', () => {
     const uploadResponse = await request(app)
       .post('/images')
       .set('Authorization', `Bearer ${token}`)
-      .attach('image', imagePath)
+      .attach('image', imagePath, {
+        filename: 'test-image.jpg',
+        contentType: 'image/jpeg',
+      })
       .expect(201);
 
     const response = await request(app)
