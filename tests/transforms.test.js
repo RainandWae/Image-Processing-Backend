@@ -17,14 +17,16 @@ const registerAndUploadImage = async () => {
     .send({
       username: 'user1',
       password: 'password123',
-    });
+    })
+    .expect(201);
 
   const userToken = registerResponse.body.token;
 
   const uploadResponse = await request(app)
     .post('/images')
     .set('Authorization', `Bearer ${userToken}`)
-    .attach('image', imagePath);
+    .attach('image', imagePath)
+    .expect(201);
 
   return {
     token: userToken,
