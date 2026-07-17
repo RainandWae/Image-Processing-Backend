@@ -36,6 +36,8 @@ This project showcases core backend concepts such as:
 - dotenv
 - helmet
 - cors
+- Swagger UI
+- Docker
 
 ## System Overview
 
@@ -81,6 +83,7 @@ flowchart TD
 src/
   config/
     db.js
+    swagger.js
 
   controllers/
     auth.controller.js
@@ -88,7 +91,9 @@ src/
 
   middleware/
     auth.middleware.js
+    error.middleware.js
     upload.middleware.js
+    validateObjectId.middleware.js
     validateTransform.middleware.js
     rateLimit.middleware.js
 
@@ -104,11 +109,20 @@ src/
     image.service.js
 
   utils/
+    asyncHandler.js
     generateToken.js
     stableStringify.js
 
   app.js
   server.js
+
+public/
+  index.html
+  styles.css
+  app.js
+
+Dockerfile
+docker-compose.yml
 ```
 
 ## Main Functionality
@@ -185,4 +199,39 @@ Health check:
 
 ```text
 GET /health
+```
+
+## Run With Docker
+
+The project includes Docker support for running the API and MongoDB together.
+
+Build and start the containers:
+
+```bash
+docker compose up --build
+```
+
+Then open:
+
+```text
+http://localhost:5000
+```
+
+Swagger docs:
+
+```text
+http://localhost:5000/api-docs
+```
+
+Stop the containers:
+
+```bash
+docker compose down
+```
+
+Docker Compose uses these services:
+
+```text
+api    - Node/Express backend
+mongo  - MongoDB database
 ```
