@@ -1,4 +1,11 @@
 const allowedFormats = ['jpeg', 'jpg', 'png', 'webp'];
+const allowedWatermarkPositions = [
+  'top-left',
+  'top-right',
+  'bottom-left',
+  'bottom-right',
+  'center',
+];
 
 const validateTransform = (req, res, next) => {
   const { transformations } = req.body;
@@ -104,6 +111,31 @@ const validateTransform = (req, res, next) => {
     return res.status(400).json({
       message: 'Quality must be an integer between 1 and 100',
     });
+  }
+
+  if (transformations.watermark) {
+    const { text, position } = transformations.watermark;
+
+    if (!text || typeof text !== 'string' || text.trim().length === 0) {
+      return res.status(400).json({
+        message: 'Watermark text is required',
+      });
+    }
+
+    if (text.length > 80) {
+      return res.status(400).json({
+        message: 'Watermark text must be 80 characters or less',
+      });
+    }
+
+    if (
+      position !== undefined &&
+      !allowedWatermarkPositions.includes(position)
+    ) {
+      return res.status(400).json({
+        message: `Watermark position must be one of: ${allowedWatermarkPositions.join(', ')}`,
+      });
+    }
   }
 
   next();

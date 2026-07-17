@@ -174,6 +174,8 @@ document.querySelector('#transformForm').addEventListener('submit', async (event
   const rotate = Number(form.get('rotate'));
   const quality = Number(form.get('quality'));
   const format = form.get('format');
+  const watermarkText = String(form.get('watermarkText') || '').trim();
+  const watermarkPosition = form.get('watermarkPosition');
 
   if (width || height) {
     transformations.resize = {};
@@ -186,6 +188,13 @@ document.querySelector('#transformForm').addEventListener('submit', async (event
   if (form.get('quality') !== '') transformations.quality = quality;
   if (form.get('flip')) transformations.flip = true;
   if (form.get('mirror')) transformations.mirror = true;
+
+  if (watermarkText) {
+    transformations.watermark = {
+      text: watermarkText,
+      position: watermarkPosition || 'bottom-right',
+    };
+  }
 
   const filters = {};
   if (form.get('grayscale')) filters.grayscale = true;
