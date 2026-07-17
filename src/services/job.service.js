@@ -7,6 +7,7 @@ const {
 } = require('./image.service');
 const stableStringify = require('../utils/stableStringify');
 const { env } = require('../config/env');
+const { createAuditLog } = require('./audit.service');
 
 const processTransformJob = async (jobId) => {
   const job = await Job.findById(jobId);
@@ -42,6 +43,18 @@ const processTransformJob = async (jobId) => {
       job.resultImage = cachedImage._id;
       job.completedAt = new Date();
       await job.save();
+
+      await createAuditLog({
+        actor: job.user,
+        action: 'TRANSFORM_JOB_COMPLETED_FROM_CACHE',
+        entityType: 'Job',
+        entityId: job._id,
+        metadata: {
+          image: originalImage._id,
+          resultImage: cachedImage._id,
+        },
+      });
+
       return;
     }
 
@@ -82,12 +95,35 @@ const processTransformJob = async (jobId) => {
     job.resultImage = transformedImage._id;
     job.completedAt = new Date();
     await job.save();
+
+    await createAuditLog({
+      actor: job.user,
+      action: 'TRANSFORM_JOB_COMPLETED',
+      entityType: 'Job',
+      entityId: job._id,
+      metadata: {
+        image: originalImage._id,
+        resultImage: transformedImage._id,
+      },
+    });
   } catch (error) {
     await Job.findByIdAndUpdate(jobId, {
       status: 'failed',
       error: error.message,
       completedAt: new Date(),
     });
+
+    if (job) {
+      await createAuditLog({
+        actor: job.user,
+        action: 'TRANSFORM_JOB_FAILED',
+        entityType: 'Job',
+        entityId: job._id,
+        metadata: {
+          error: error.message,
+        },
+      });
+    }
   }
 };
 

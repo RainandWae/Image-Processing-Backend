@@ -2,6 +2,7 @@ const Image = require('../models/Image');
 const Job = require('../models/Job');
 const asyncHandler = require('../utils/asyncHandler');
 const { enqueueTransformJob } = require('../services/job.service');
+const { createAuditLog } = require('../services/audit.service');
 
 const createTransformJob = asyncHandler(async (req, res) => {
   const { transformations } = req.body;
@@ -29,6 +30,18 @@ const createTransformJob = asyncHandler(async (req, res) => {
     type: 'transform',
     status: 'pending',
     transformations,
+  });
+
+  await createAuditLog({
+    actor: req.user._id,
+    action: 'TRANSFORM_JOB_CREATED',
+    entityType: 'Job',
+    entityId: job._id,
+    metadata: {
+      image: image._id,
+      transformations,
+    },
+    req,
   });
 
   enqueueTransformJob(job._id);

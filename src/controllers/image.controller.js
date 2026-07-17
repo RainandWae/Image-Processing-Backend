@@ -9,6 +9,7 @@ const {
 const stableStringify = require('../utils/stableStringify');
 const asyncHandler = require('../utils/asyncHandler');
 const { env } = require('../config/env');
+const { createAuditLog } = require('../services/audit.service');
 
 const deleteFileIfExists = (filePath) => {
   if (filePath && fs.existsSync(filePath)) {
@@ -46,6 +47,20 @@ const uploadImage = asyncHandler(async (req, res) => {
     width: metadata.width,
     height: metadata.height,
     format: metadata.format,
+  });
+
+  await createAuditLog({
+    actor: req.user._id,
+    action: 'IMAGE_UPLOADED',
+    entityType: 'Image',
+    entityId: image._id,
+    metadata: {
+      originalName: image.originalName,
+      filename: image.filename,
+      size: image.size,
+      format: image.format,
+    },
+    req,
   });
 
   return res.status(201).json({
@@ -134,6 +149,18 @@ const transformImage = asyncHandler(async (req, res) => {
   });
 
   if (cachedImage) {
+    await createAuditLog({
+      actor: req.user._id,
+      action: 'IMAGE_TRANSFORM_CACHE_HIT',
+      entityType: 'Image',
+      entityId: cachedImage._id,
+      metadata: {
+        originalImage: originalImage._id,
+        transformations,
+      },
+      req,
+    });
+
     return res.status(200).json({
       id: cachedImage._id,
       originalImage: originalImage._id,
@@ -180,6 +207,18 @@ const transformImage = asyncHandler(async (req, res) => {
     parentImage: originalImage._id,
     transformations,
     transformationKey,
+  });
+
+  await createAuditLog({
+    actor: req.user._id,
+    action: 'IMAGE_TRANSFORMED',
+    entityType: 'Image',
+    entityId: transformedImage._id,
+    metadata: {
+      originalImage: originalImage._id,
+      transformations,
+    },
+    req,
   });
 
   return res.status(201).json({
@@ -229,6 +268,18 @@ const deleteImage = asyncHandler(async (req, res) => {
     _id: {
       $in: imagesToDelete.map((imageToDelete) => imageToDelete._id),
     },
+  });
+
+  await createAuditLog({
+    actor: req.user._id,
+    action: image.isTransformed ? 'TRANSFORMED_IMAGE_DELETED' : 'IMAGE_DELETED',
+    entityType: 'Image',
+    entityId: image._id,
+    metadata: {
+      deletedCount: imagesToDelete.length,
+      deletedImageIds: imagesToDelete.map((imageToDelete) => imageToDelete._id),
+    },
+    req,
   });
 
   return res.status(200).json({

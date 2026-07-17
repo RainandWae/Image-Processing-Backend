@@ -7,13 +7,22 @@ const {
 } = require('../utils/refreshToken');
 const asyncHandler = require('../utils/asyncHandler');
 const { env } = require('../config/env');
+const { createAuditLog } = require('../services/audit.service');
 
-const buildAuthResponse = async (user, statusCode, res) => {
+const buildAuthResponse = async (user, statusCode, req, res, action) => {
   const token = generateToken(user._id);
   const refreshToken = generateRefreshToken(user._id);
 
   user.refreshTokenHash = hashRefreshToken(refreshToken);
   await user.save();
+
+  await createAuditLog({
+    actor: user._id,
+    action,
+    entityType: 'User',
+    entityId: user._id,
+    req,
+  });
 
   return res.status(statusCode).json({
     user: {
@@ -48,7 +57,7 @@ const registerUser = asyncHandler(async (req, res) => {
     password,
   });
 
-  return buildAuthResponse(user, 201, res);
+  return buildAuthResponse(user, 201, req, res, 'USER_REGISTERED');
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -76,7 +85,7 @@ const loginUser = asyncHandler(async (req, res) => {
     });
   }
 
-  return buildAuthResponse(user, 200, res);
+  return buildAuthResponse(user, 200, req, res, 'USER_LOGGED_IN');
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
@@ -116,6 +125,14 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
   const token = generateToken(user._id);
 
+  await createAuditLog({
+    actor: user._id,
+    action: 'REFRESH_TOKEN_USED',
+    entityType: 'User',
+    entityId: user._id,
+    req,
+  });
+
   return res.status(200).json({
     token,
   });
@@ -132,10 +149,21 @@ const logoutUser = asyncHandler(async (req, res) => {
 
   const refreshTokenHash = hashRefreshToken(refreshToken);
 
-  await User.findOneAndUpdate(
+  const user = await User.findOneAndUpdate(
     { refreshTokenHash },
-    { refreshTokenHash: null }
+    { refreshTokenHash: null },
+    { returnDocument: 'after' }
   );
+
+  if (user) {
+    await createAuditLog({
+      actor: user._id,
+      action: 'USER_LOGGED_OUT',
+      entityType: 'User',
+      entityId: user._id,
+      req,
+    });
+  }
 
   return res.status(200).json({
     message: 'Logged out successfully',

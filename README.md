@@ -23,6 +23,7 @@ This project showcases core backend concepts such as:
 - Local file cleanup when deleting records
 - Cascade deletion for original images and their transformed children
 - Transformation caching to avoid duplicate processing
+- Domain audit logging for security-sensitive and admin actions
 - Separation of routes, controllers, middleware, models, services, and utilities
 
 ## Tech Stack
@@ -106,6 +107,7 @@ src/
     rateLimit.middleware.js
 
   models/
+    AuditLog.js
     User.js
     Image.js
     Job.js
@@ -117,6 +119,7 @@ src/
     job.routes.js
 
   services/
+    audit.service.js
     image.service.js
     job.service.js
 
@@ -147,6 +150,8 @@ Uploaded images are saved locally, while metadata such as owner, filename, path,
 Image operations are scoped to the authenticated user, so users can only list, retrieve, transform, or delete their own images.
 
 Admin routes use role-based authorization. Normal users receive `403 Forbidden` on admin endpoints, while users with the `admin` role can inspect users, images, and background jobs across the system.
+
+The backend also stores domain audit logs for important events such as registration, login, refresh-token usage, logout, image upload, image transformation, image deletion, transform job lifecycle events, and admin record access. Admins can query audit logs with filters and pagination.
 
 Deleting a transformed image removes only that transformed image. Deleting an original image also deletes its transformed child images and their local files.
 
@@ -200,6 +205,7 @@ GET    /api/v1/jobs/:id
 GET    /api/v1/admin/users
 GET    /api/v1/admin/images
 GET    /api/v1/admin/jobs
+GET    /api/v1/admin/audit-logs
 ```
 
 The original root routes still work for backwards compatibility, but new clients should use `/api/v1`.

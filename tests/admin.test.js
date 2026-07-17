@@ -63,4 +63,60 @@ describe('Admin API', () => {
     expect(response.body.users[0].password).toBeUndefined();
     expect(response.body.users[0].refreshTokenHash).toBeUndefined();
   });
+
+  test('allows admin users to view filtered audit logs', async () => {
+    await User.create({
+      username: 'auditadmin',
+      password: 'password123',
+      role: 'admin',
+    });
+
+    const loginResponse = await request(app)
+      .post('/api/v1/login')
+      .send({
+        username: 'auditadmin',
+        password: 'password123',
+      })
+      .expect(200);
+
+    await request(app)
+      .post('/api/v1/register')
+      .send({
+        username: 'auditeduser',
+        password: 'password123',
+      })
+      .expect(201);
+
+    const response = await request(app)
+      .get('/api/v1/admin/audit-logs?action=USER_REGISTERED')
+      .set('Authorization', `Bearer ${loginResponse.body.token}`)
+      .expect(200);
+
+    expect(response.body.total).toBe(1);
+    expect(response.body.auditLogs[0].action).toBe('USER_REGISTERED');
+    expect(response.body.auditLogs[0].actor.username).toBe('auditeduser');
+  });
+
+  test('rejects invalid audit log actor filter', async () => {
+    await User.create({
+      username: 'filteradmin',
+      password: 'password123',
+      role: 'admin',
+    });
+
+    const loginResponse = await request(app)
+      .post('/api/v1/login')
+      .send({
+        username: 'filteradmin',
+        password: 'password123',
+      })
+      .expect(200);
+
+    const response = await request(app)
+      .get('/api/v1/admin/audit-logs?actor=bad-id')
+      .set('Authorization', `Bearer ${loginResponse.body.token}`)
+      .expect(400);
+
+    expect(response.body.message).toBe('Invalid actor id');
+  });
 });
