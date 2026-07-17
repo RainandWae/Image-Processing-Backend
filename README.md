@@ -129,6 +129,20 @@ The project also includes a simple frontend served directly by Express from the 
 
 The frontend supports registering, logging in, uploading images, listing user-owned images, selecting an image, running transformations, opening image URLs, deleting images, and viewing raw API responses.
 
+## API Documentation
+
+Swagger UI is available for browsing and testing documented API routes in the browser.
+
+```text
+http://localhost:5000/api-docs
+```
+
+The Swagger setup lives in:
+
+```text
+src/config/swagger.js
+```
+
 ## Environment Variables
 
 Create a `.env` file in the project root:

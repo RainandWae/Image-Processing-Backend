@@ -12,8 +12,78 @@ const protect = require('../middleware/auth.middleware');
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: user1
+ *               password:
+ *                 type: string
+ *                 example: password123
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ */
+
 router.post('/register', registerUser);
+
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: user1
+ *               password:
+ *                 type: string
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         description: User logged in successfully
+ */
+
 router.post('/login', loginUser);
+
+/**
+ * @swagger
+ * /me:
+ *   get:
+ *     summary: Get current authenticated user
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Current user returned
+ *       401:
+ *         description: Unauthorized
+ */
 
 // added protected route GET /me
 router.get('/me', protect, (req, res) => {
