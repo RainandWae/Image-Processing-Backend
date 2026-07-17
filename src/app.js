@@ -6,6 +6,10 @@ const authRoutes = require('./routes/auth.routes');
 const imageRoutes = require('./routes/image.routes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
+const {
+  errorHandler,
+  notFound,
+} = require('./middleware/error.middleware');
 
 const app = express();
 
@@ -30,10 +34,7 @@ app.get('/health', (req, res) => {
 app.use('/', authRoutes);
 app.use('/', imageRoutes);
 
-app.use((req, res) => {
-  res.status(404).json({
-    message: 'Route not found',
-  });
-});
+app.use(notFound);
+app.use(errorHandler);
 
 module.exports = app;
