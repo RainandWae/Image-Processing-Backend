@@ -9,6 +9,8 @@ services:
       MONGO_URI: mongodb://mongo:27017/image-processing-service
       JWT_SECRET: replace_this_with_a_long_secret
       JWT_EXPIRES_IN: 7d
+      REFRESH_TOKEN_SECRET: replace_this_with_a_different_long_secret
+      REFRESH_TOKEN_EXPIRES_IN: 30d
       BASE_URL: http://localhost:5000
       UPLOAD_MAX_FILE_SIZE_BYTES: 5242880
       UPLOAD_RATE_LIMIT_WINDOW_MS: 900000

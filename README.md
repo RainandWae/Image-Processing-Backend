@@ -119,6 +119,7 @@ src/
   utils/
     asyncHandler.js
     generateToken.js
+    refreshToken.js
     stableStringify.js
 
   app.js
@@ -135,7 +136,7 @@ docker-compose.yml
 
 ## Main Functionality
 
-The backend supports user registration and login with hashed passwords. After login, users receive a JWT, which is required for protected image routes.
+The backend supports user registration and login with hashed passwords. After login, users receive a JWT access token and a refresh token. The access token is used for protected routes, while the refresh token can be used to request a new access token or log out by revoking the stored refresh token hash.
 
 Uploaded images are saved locally, while metadata such as owner, filename, path, URL, size, dimensions, format, and transformation details are stored in MongoDB.
 
@@ -180,6 +181,8 @@ Example routes:
 ```text
 POST   /api/v1/register
 POST   /api/v1/login
+POST   /api/v1/refresh-token
+POST   /api/v1/logout
 GET    /api/v1/me
 POST   /api/v1/images
 GET    /api/v1/images

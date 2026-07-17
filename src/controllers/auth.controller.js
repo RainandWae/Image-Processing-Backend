@@ -1,6 +1,29 @@
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
+const {
+  generateRefreshToken,
+  hashRefreshToken,
+} = require('../utils/refreshToken');
 const asyncHandler = require('../utils/asyncHandler');
+const { env } = require('../config/env');
+
+const buildAuthResponse = async (user, statusCode, res) => {
+  const token = generateToken(user._id);
+  const refreshToken = generateRefreshToken(user._id);
+
+  user.refreshTokenHash = hashRefreshToken(refreshToken);
+  await user.save();
+
+  return res.status(statusCode).json({
+    user: {
+      id: user._id,
+      username: user.username,
+    },
+    token,
+    refreshToken,
+  });
+};
 
 const registerUser = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
@@ -24,15 +47,7 @@ const registerUser = asyncHandler(async (req, res) => {
     password,
   });
 
-  const token = generateToken(user._id);
-
-  return res.status(201).json({
-    user: {
-      id: user._id,
-      username: user.username,
-    },
-    token,
-  });
+  return buildAuthResponse(user, 201, res);
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -60,18 +75,75 @@ const loginUser = asyncHandler(async (req, res) => {
     });
   }
 
+  return buildAuthResponse(user, 200, res);
+});
+
+const refreshAccessToken = asyncHandler(async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.status(400).json({
+      message: 'Refresh token is required',
+    });
+  }
+
+  let decoded;
+
+  try {
+    decoded = jwt.verify(refreshToken, env.refreshTokenSecret);
+  } catch (error) {
+    return res.status(401).json({
+      message: 'Invalid or expired refresh token',
+    });
+  }
+
+  const user = await User.findById(decoded.id);
+
+  if (!user || !user.refreshTokenHash) {
+    return res.status(401).json({
+      message: 'Invalid or expired refresh token',
+    });
+  }
+
+  const incomingRefreshTokenHash = hashRefreshToken(refreshToken);
+
+  if (incomingRefreshTokenHash !== user.refreshTokenHash) {
+    return res.status(401).json({
+      message: 'Invalid or expired refresh token',
+    });
+  }
+
   const token = generateToken(user._id);
 
   return res.status(200).json({
-    user: {
-      id: user._id,
-      username: user.username,
-    },
     token,
+  });
+});
+
+const logoutUser = asyncHandler(async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.status(400).json({
+      message: 'Refresh token is required',
+    });
+  }
+
+  const refreshTokenHash = hashRefreshToken(refreshToken);
+
+  await User.findOneAndUpdate(
+    { refreshTokenHash },
+    { refreshTokenHash: null }
+  );
+
+  return res.status(200).json({
+    message: 'Logged out successfully',
   });
 });
 
 module.exports = {
   registerUser,
   loginUser,
+  refreshAccessToken,
+  logoutUser,
 };

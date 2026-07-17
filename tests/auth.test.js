@@ -99,4 +99,49 @@ describe('Auth API', () => {
 
     expect(meResponse.body.user.username).toBe('versioned-user');
   });
+
+  test('refreshes access token with valid refresh token', async () => {
+    const registerResponse = await request(app)
+      .post('/api/v1/register')
+      .send({
+        username: 'refresh-user',
+        password: 'password123',
+      })
+      .expect(201);
+
+    const response = await request(app)
+      .post('/api/v1/refresh-token')
+      .send({
+        refreshToken: registerResponse.body.refreshToken,
+      })
+      .expect(200);
+
+    expect(response.body.token).toBeDefined();
+  });
+
+  test('logout revokes refresh token', async () => {
+    const registerResponse = await request(app)
+      .post('/api/v1/register')
+      .send({
+        username: 'logout-user',
+        password: 'password123',
+      })
+      .expect(201);
+
+    await request(app)
+      .post('/api/v1/logout')
+      .send({
+        refreshToken: registerResponse.body.refreshToken,
+      })
+      .expect(200);
+
+    const response = await request(app)
+      .post('/api/v1/refresh-token')
+      .send({
+        refreshToken: registerResponse.body.refreshToken,
+      })
+      .expect(401);
+
+    expect(response.body.message).toBe('Invalid or expired refresh token');
+  });
 });

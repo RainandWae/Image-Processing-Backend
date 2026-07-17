@@ -40,6 +40,14 @@ const env = {
     return process.env.JWT_EXPIRES_IN || '7d';
   },
 
+  get refreshTokenSecret() {
+    return process.env.REFRESH_TOKEN_SECRET || `${this.jwtSecret}_refresh`;
+  },
+
+  get refreshTokenExpiresIn() {
+    return process.env.REFRESH_TOKEN_EXPIRES_IN || '30d';
+  },
+
   get baseUrl() {
     return process.env.BASE_URL || `http://localhost:${this.port}`;
   },

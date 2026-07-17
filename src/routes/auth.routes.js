@@ -2,6 +2,8 @@ const express = require('express');
 const {
   registerUser,
   loginUser,
+  refreshAccessToken,
+  logoutUser,
 } = require('../controllers/auth.controller');
 
 // import protect
@@ -69,6 +71,10 @@ router.post('/register', registerUser);
  */
 
 router.post('/login', loginUser);
+
+router.post('/refresh-token', refreshAccessToken);
+
+router.post('/logout', logoutUser);
 
 /**
  * @swagger
