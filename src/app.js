@@ -8,11 +8,17 @@ const jobRoutes = require('./routes/job.routes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 const {
+  requestLogger,
+  errorLogger,
+} = require('./middleware/logger.middleware');
+const {
   errorHandler,
   notFound,
 } = require('./middleware/error.middleware');
 
 const app = express();
+
+app.use(requestLogger);
 
 app.use(helmet());
 app.use(cors());
@@ -38,6 +44,7 @@ app.use('/', authRoutes);
 app.use('/', imageRoutes);
 
 app.use(notFound);
+app.use(errorLogger);
 app.use(errorHandler);
 
 module.exports = app;
