@@ -93,12 +93,13 @@ router.post('/logout', logoutUser);
 
 // added protected route GET /me
 router.get('/me', protect, (req, res) => {
-    res.status(200).json({
-        user: {
-            id: req.user._id,
-            username: req.user.username,
-        },
-    });
+  res.status(200).json({
+    user: {
+      id: req.user._id,
+      username: req.user.username,
+      role: req.user.role,
+    },
+  });
 });
 
 module.exports = router;

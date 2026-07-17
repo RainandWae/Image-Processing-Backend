@@ -11,6 +11,7 @@ This project showcases core backend concepts such as:
 - JWT-based authentication
 - Password hashing with bcrypt
 - Protected routes with authentication middleware
+- Role-based authorization for admin-only routes
 - User ownership checks for protected resources
 - MongoDB data modeling with Mongoose
 - Multipart file uploads with Multer
@@ -89,12 +90,14 @@ src/
     swagger.js
 
   controllers/
+    admin.controller.js
     auth.controller.js
     image.controller.js
     job.controller.js
 
   middleware/
     auth.middleware.js
+    authorize.middleware.js
     error.middleware.js
     logger.middleware.js
     upload.middleware.js
@@ -108,6 +111,7 @@ src/
     Job.js
 
   routes/
+    admin.routes.js
     auth.routes.js
     image.routes.js
     job.routes.js
@@ -141,6 +145,8 @@ The backend supports user registration and login with hashed passwords. After lo
 Uploaded images are saved locally, while metadata such as owner, filename, path, URL, size, dimensions, format, and transformation details are stored in MongoDB.
 
 Image operations are scoped to the authenticated user, so users can only list, retrieve, transform, or delete their own images.
+
+Admin routes use role-based authorization. Normal users receive `403 Forbidden` on admin endpoints, while users with the `admin` role can inspect users, images, and background jobs across the system.
 
 Deleting a transformed image removes only that transformed image. Deleting an original image also deletes its transformed child images and their local files.
 
@@ -191,6 +197,9 @@ DELETE /api/v1/images/:id
 POST   /api/v1/images/:id/transform
 POST   /api/v1/images/:id/jobs
 GET    /api/v1/jobs/:id
+GET    /api/v1/admin/users
+GET    /api/v1/admin/images
+GET    /api/v1/admin/jobs
 ```
 
 The original root routes still work for backwards compatibility, but new clients should use `/api/v1`.

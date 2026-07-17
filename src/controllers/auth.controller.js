@@ -19,6 +19,7 @@ const buildAuthResponse = async (user, statusCode, res) => {
     user: {
       id: user._id,
       username: user.username,
+      role: user.role,
     },
     token,
     refreshToken,
