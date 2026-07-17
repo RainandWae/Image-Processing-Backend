@@ -6,6 +6,7 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { env } = require('../config/env');
 
 const originalsDir = path.join('uploads', 'originals');
 const transformedDir = path.join('uploads', 'transformed');
@@ -44,7 +45,7 @@ const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024,
+    fileSize: env.uploadMaxFileSizeBytes,
   },
 });
 

@@ -6,6 +6,7 @@ const {
   buildTransformedFilename,
 } = require('./image.service');
 const stableStringify = require('../utils/stableStringify');
+const { env } = require('../config/env');
 
 const processTransformJob = async (jobId) => {
   const job = await Job.findById(jobId);
@@ -65,7 +66,7 @@ const processTransformJob = async (jobId) => {
       originalName: originalImage.originalName,
       filename: transformedFilename,
       path: outputPath,
-      url: `${process.env.BASE_URL}/uploads/transformed/${transformedFilename}`,
+      url: `${env.baseUrl}/uploads/transformed/${transformedFilename}`,
       mimeType: `image/${metadata.format}`,
       size: metadata.size || 0,
       width: metadata.width,

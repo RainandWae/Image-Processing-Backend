@@ -8,6 +8,7 @@ const {
 } = require('../services/image.service');
 const stableStringify = require('../utils/stableStringify');
 const asyncHandler = require('../utils/asyncHandler');
+const { env } = require('../config/env');
 
 const deleteFileIfExists = (filePath) => {
   if (filePath && fs.existsSync(filePath)) {
@@ -39,7 +40,7 @@ const uploadImage = asyncHandler(async (req, res) => {
     originalName: req.file.originalname,
     filename: req.file.filename,
     path: req.file.path,
-    url: `${process.env.BASE_URL}/uploads/originals/${req.file.filename}`,
+    url: `${env.baseUrl}/uploads/originals/${req.file.filename}`,
     mimeType: req.file.mimetype,
     size: req.file.size,
     width: metadata.width,
@@ -169,7 +170,7 @@ const transformImage = asyncHandler(async (req, res) => {
     originalName: originalImage.originalName,
     filename: transformedFilename,
     path: outputPath,
-    url: `${process.env.BASE_URL}/uploads/transformed/${transformedFilename}`,
+    url: `${env.baseUrl}/uploads/transformed/${transformedFilename}`,
     mimeType: `image/${metadata.format}`,
     size: metadata.size || 0,
     width: metadata.width,

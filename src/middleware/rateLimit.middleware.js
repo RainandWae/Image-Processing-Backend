@@ -1,9 +1,10 @@
 const rateLimit = require('express-rate-limit');
+const { env } = require('../config/env');
 
 const transformRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  skip: () => process.env.NODE_ENV === 'test',
+  windowMs: env.transformRateLimitWindowMs,
+  max: env.transformRateLimitMax,
+  skip: () => env.isTest,
   message: {
     message: 'Too many transformation requests. Please try again later.',
   },
@@ -12,9 +13,9 @@ const transformRateLimiter = rateLimit({
 });
 
 const uploadRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 20,
-  skip: () => process.env.NODE_ENV === 'test',
+  windowMs: env.uploadRateLimitWindowMs,
+  max: env.uploadRateLimitMax,
+  skip: () => env.isTest,
   message: {
     message: 'Too many upload requests. Please try again later.',
   },

@@ -171,9 +171,14 @@ MONGO_URI=mongodb://127.0.0.1:27017/image-processing-service
 JWT_SECRET=replace_this_with_a_long_secret
 JWT_EXPIRES_IN=7d
 BASE_URL=http://localhost:5000
+UPLOAD_MAX_FILE_SIZE_BYTES=5242880
+UPLOAD_RATE_LIMIT_WINDOW_MS=900000
+UPLOAD_RATE_LIMIT_MAX=20
+TRANSFORM_RATE_LIMIT_WINDOW_MS=900000
+TRANSFORM_RATE_LIMIT_MAX=10
 ```
 
-The app validates required environment variables on startup.
+Environment handling is centralized in `src/config/env.js`. The app validates required variables on startup and provides defaults for optional runtime settings like upload size and rate limits.
 
 ## Run Locally
 
