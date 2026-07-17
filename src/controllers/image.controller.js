@@ -9,6 +9,12 @@ const {
 const stableStringify = require('../utils/stableStringify');
 const asyncHandler = require('../utils/asyncHandler');
 
+const deleteFileIfExists = (filePath) => {
+  if (filePath && fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+  }
+};
+
 const uploadImage = asyncHandler(async (req, res) => {
   if (!req.file) {
     return res.status(400).json({
@@ -16,7 +22,17 @@ const uploadImage = asyncHandler(async (req, res) => {
     });
   }
 
-  const metadata = await sharp(req.file.path).metadata();
+  let metadata;
+
+  try {
+    metadata = await sharp(req.file.path).metadata();
+  } catch (error) {
+    deleteFileIfExists(req.file.path);
+
+    return res.status(400).json({
+      message: 'Uploaded file is not a valid image',
+    });
+  }
 
   const image = await Image.create({
     user: req.user._id,
@@ -194,15 +210,32 @@ const deleteImage = asyncHandler(async (req, res) => {
     });
   }
 
-  if (fs.existsSync(image.path)) {
-    fs.unlinkSync(image.path);
-  }
+  const imagesToDelete = image.isTransformed
+    ? [image]
+    : await Image.find({
+        user: req.user._id,
+        $or: [
+          { _id: image._id },
+          { parentImage: image._id },
+        ],
+      });
 
-  await Image.deleteOne({ _id: image._id });
+  imagesToDelete.forEach((imageToDelete) => {
+    deleteFileIfExists(imageToDelete.path);
+  });
+
+  await Image.deleteMany({
+    _id: {
+      $in: imagesToDelete.map((imageToDelete) => imageToDelete._id),
+    },
+  });
 
   return res.status(200).json({
-    message: 'Image deleted successfully',
+    message: image.isTransformed
+      ? 'Image deleted successfully'
+      : 'Original image and transformed children deleted successfully',
     id: image._id,
+    deletedCount: imagesToDelete.length,
   });
 });
 

@@ -16,9 +16,11 @@ This project showcases core backend concepts such as:
 - Multipart file uploads with Multer
 - Request validation
 - Rate limiting for expensive operations
+- Upload rate limiting
 - Pagination
 - File metadata storage
 - Local file cleanup when deleting records
+- Cascade deletion for original images and their transformed children
 - Transformation caching to avoid duplicate processing
 - Separation of routes, controllers, middleware, models, services, and utilities
 
@@ -133,6 +135,8 @@ Uploaded images are saved locally, while metadata such as owner, filename, path,
 
 Image operations are scoped to the authenticated user, so users can only list, retrieve, transform, or delete their own images.
 
+Deleting a transformed image removes only that transformed image. Deleting an original image also deletes its transformed child images and their local files.
+
 Basic image processing is handled with Sharp. The transformation functionality is kept simple and currently supports operations such as resizing, rotating, flipping, mirroring, format conversion, grayscale/sepia filters, and quality control.
 
 To avoid unnecessary duplicate work, transformed images are cached using a stable transformation key. If the same user requests the same transformation for the same original image, the API returns the existing transformed image instead of generating another file.
@@ -145,7 +149,7 @@ The frontend supports registering, logging in, uploading images, listing user-ow
 
 ## API Documentation
 
-Swagger UI is available for browsing and testing documented API routes in the browser.
+Swagger UI is available for browsing and testing documented API routes in the browser, including authentication and image management routes.
 
 ```text
 http://localhost:5000/api-docs
@@ -159,7 +163,7 @@ src/config/swagger.js
 
 ## Environment Variables
 
-Create a `.env` file in the project root:
+Create a `.env` file in the project root. A starter template is available in `.env.example`.
 
 ```env
 PORT=5000
@@ -168,6 +172,8 @@ JWT_SECRET=replace_this_with_a_long_secret
 JWT_EXPIRES_IN=7d
 BASE_URL=http://localhost:5000
 ```
+
+The app validates required environment variables on startup.
 
 ## Run Locally
 
