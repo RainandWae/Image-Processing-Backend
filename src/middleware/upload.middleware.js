@@ -5,10 +5,17 @@
 
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+
+const originalsDir = path.join('uploads', 'originals');
+const transformedDir = path.join('uploads', 'transformed');
+
+fs.mkdirSync(originalsDir, { recursive: true });
+fs.mkdirSync(transformedDir, { recursive: true });
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/originals');
+    cb(null, originalsDir);
   },
   filename: (req, file, cb) => {
     const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`;
