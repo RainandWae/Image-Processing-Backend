@@ -15,6 +15,7 @@ This project showcases core backend concepts such as:
 - User ownership checks for protected resources
 - MongoDB data modeling with Mongoose
 - Multipart file uploads with Multer
+- Storage service abstraction around local file paths, URLs, and deletion
 - Request validation
 - Rate limiting for expensive operations
 - Upload rate limiting
@@ -122,6 +123,7 @@ src/
     audit.service.js
     image.service.js
     job.service.js
+    storage.service.js
 
   utils/
     asyncHandler.js
@@ -145,7 +147,7 @@ docker-compose.yml
 
 The backend supports user registration and login with hashed passwords. After login, users receive a JWT access token and a refresh token. The access token is used for protected routes, while the refresh token can be used to request a new access token or log out by revoking the stored refresh token hash.
 
-Uploaded images are saved locally, while metadata such as owner, filename, path, URL, size, dimensions, format, and transformation details are stored in MongoDB.
+Uploaded images are saved locally, while metadata such as owner, filename, path, URL, size, dimensions, format, and transformation details are stored in MongoDB. File path generation, public URL generation, upload directory setup, and file deletion are centralized behind a storage service so the controllers are not tightly coupled to local disk storage.
 
 Image operations are scoped to the authenticated user, so users can only list, retrieve, transform, or delete their own images.
 

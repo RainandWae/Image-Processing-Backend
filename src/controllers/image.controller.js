@@ -1,5 +1,3 @@
-const fs = require('fs');
-const path = require('path');
 const sharp = require('sharp');
 const Image = require('../models/Image');
 const {
@@ -8,14 +6,13 @@ const {
 } = require('../services/image.service');
 const stableStringify = require('../utils/stableStringify');
 const asyncHandler = require('../utils/asyncHandler');
-const { env } = require('../config/env');
 const { createAuditLog } = require('../services/audit.service');
-
-const deleteFileIfExists = (filePath) => {
-  if (filePath && fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-  }
-};
+const {
+  getOriginalUrl,
+  getTransformedPath,
+  getTransformedUrl,
+  deleteFileIfExists,
+} = require('../services/storage.service');
 
 const uploadImage = asyncHandler(async (req, res) => {
   if (!req.file) {
@@ -41,7 +38,7 @@ const uploadImage = asyncHandler(async (req, res) => {
     originalName: req.file.originalname,
     filename: req.file.filename,
     path: req.file.path,
-    url: `${env.baseUrl}/uploads/originals/${req.file.filename}`,
+    url: getOriginalUrl(req.file.filename),
     mimeType: req.file.mimetype,
     size: req.file.size,
     width: metadata.width,
@@ -184,7 +181,7 @@ const transformImage = asyncHandler(async (req, res) => {
     outputFormat
   );
 
-  const outputPath = path.join('uploads', 'transformed', transformedFilename);
+  const outputPath = getTransformedPath(transformedFilename);
 
   const metadata = await applyTransformations(
     originalImage.path,
@@ -197,7 +194,7 @@ const transformImage = asyncHandler(async (req, res) => {
     originalName: originalImage.originalName,
     filename: transformedFilename,
     path: outputPath,
-    url: `${env.baseUrl}/uploads/transformed/${transformedFilename}`,
+    url: getTransformedUrl(transformedFilename),
     mimeType: `image/${metadata.format}`,
     size: metadata.size || 0,
     width: metadata.width,

@@ -1,4 +1,3 @@
-const path = require('path');
 const Image = require('../models/Image');
 const Job = require('../models/Job');
 const {
@@ -6,8 +5,11 @@ const {
   buildTransformedFilename,
 } = require('./image.service');
 const stableStringify = require('../utils/stableStringify');
-const { env } = require('../config/env');
 const { createAuditLog } = require('./audit.service');
+const {
+  getTransformedPath,
+  getTransformedUrl,
+} = require('./storage.service');
 
 const processTransformJob = async (jobId) => {
   const job = await Job.findById(jobId);
@@ -66,7 +68,7 @@ const processTransformJob = async (jobId) => {
       outputFormat
     );
 
-    const outputPath = path.join('uploads', 'transformed', transformedFilename);
+    const outputPath = getTransformedPath(transformedFilename);
 
     const metadata = await applyTransformations(
       originalImage.path,
@@ -79,7 +81,7 @@ const processTransformJob = async (jobId) => {
       originalName: originalImage.originalName,
       filename: transformedFilename,
       path: outputPath,
-      url: `${env.baseUrl}/uploads/transformed/${transformedFilename}`,
+      url: getTransformedUrl(transformedFilename),
       mimeType: `image/${metadata.format}`,
       size: metadata.size || 0,
       width: metadata.width,

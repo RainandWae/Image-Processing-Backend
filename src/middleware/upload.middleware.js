@@ -5,14 +5,8 @@
 
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 const { env } = require('../config/env');
-
-const originalsDir = path.join('uploads', 'originals');
-const transformedDir = path.join('uploads', 'transformed');
-
-fs.mkdirSync(originalsDir, { recursive: true });
-fs.mkdirSync(transformedDir, { recursive: true });
+const { originalsDir } = require('../services/storage.service');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
